@@ -1,0 +1,29 @@
+name: Toot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6,14,20 * * *'
+
+jobs:
+  tweet:
+    runs-on: ubuntu-latest
+    env:
+       OAUTH_TOKEN: ${{secrets.OAUTH_TOKEN}}
+       OAUTH_SECRET: ${{secrets.OAUTH_SECRET}}
+       CONSUMER_KEY: ${{secrets.CONSUMER_KEY}}
+       CONSUMER_SECRET: ${{secrets.CONSUMER_SECRET}}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y gettext-base
+        pip install requests twitter
+    - name: Tweet
+      run: |
+        envsubst < config.json.example > config.json
+        python tweet.py
